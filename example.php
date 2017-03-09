@@ -243,7 +243,7 @@ function getChannelVideos($channel_id)
   $params = [
       'part'=> 'snippet',
       'playlistId' => $playlist,
-      'maxResults'=> '50',
+      'maxResults'=> '5',
       'key'=> $apiKey
   ];
   $url = $baseUrl . 'playlistItems?' . http_build_query($params);
