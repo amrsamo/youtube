@@ -1,5 +1,31 @@
 <?php
 
+  
+    $HTTP_HOST = $_SERVER['HTTP_HOST'];
+
+    if($HTTP_HOST == 'localhost')
+    {
+        //Development
+        $servername = "localhost";
+        $username = "root";
+        $password = "root";
+        $dbname = "youtube";
+    }
+    else
+    {
+        //Production
+        $servername = "localhost";
+        $username = "root";
+        $password = ".?R](%B=<NE,6'g";
+        $dbname = "youtube";
+    }
+
+
+    $GLOBALS['conn'] = new mysqli($servername, $username, $password, $dbname);
+    // Check connection
+    if ($GLOBALS['conn']->connect_error) {
+        die("Connection failed: " . $GLOBALS['conn']->connect_error);
+    } 
 
 
   require_once ($_SERVER["DOCUMENT_ROOT"].'/youtube/google-api-php-client/src/Google_Client.php');
@@ -135,24 +161,10 @@ function processResponse($searchResponse)
 function saveTag($tag,$video_id,$channel_id)
 {
   
-  // printme($tag);
-  // printme($video_id);
-  // exit();
-
-  $servername = "localhost";
-  $username = "root";
-  $password = "root";
-  $dbname = "youtube";
-
-  // Create connection
-  $conn = new mysqli($servername, $username, $password, $dbname);
-  // Check connection
-  if ($conn->connect_error) {
-      die("Connection failed: " . $conn->connect_error);
-  } 
+ 
 
   $sql = "SELECT * FROM tag where tag = '".$tag."'";
-  $result = $conn->query($sql);
+  $result = $GLOBALS['conn']->query($sql);
 
   if ($result->num_rows > 0) {
       // UPDATE AVAILABLE TAG
@@ -171,19 +183,18 @@ function saveTag($tag,$video_id,$channel_id)
         VALUES ('".$tag."',1)";
   }
 
-  $conn->query($sql);
+  $GLOBALS['conn']->query($sql);
   if(isset($id))
     $last_id = $id;
   else
-    $last_id = $conn->insert_id;
+    $last_id = $GLOBALS['conn']->insert_id;
 
 
 
   $sql = "INSERT INTO video_tag (video_id, tag_id,channel_id)
         VALUES ('".$video_id."',".$last_id.",'".$channel_id."')";
 
-  $conn->query($sql);
-  $conn->close();
+  $GLOBALS['conn']->query($sql);
   
 
 }
@@ -267,20 +278,10 @@ function getChannelVideos($channel_id)
 
 function saveChannel($data)
 {
-  $servername = "localhost";
-  $username = "root";
-  $password = "root";
-  $dbname = "youtube";
-
-  // Create connection
-  $conn = new mysqli($servername, $username, $password, $dbname);
-  // Check connection
-  if ($conn->connect_error) {
-      die("Connection failed: " . $conn->connect_error);
-  }
+  
 
   $sql = "SELECT * FROM channel where channel_id = '".$data['channel_id']."'";
-  $result = $conn->query($sql);
+  $result = $GLOBALS['conn']->query($sql);
 
   if ($result->num_rows > 0) {
       return;
@@ -294,33 +295,21 @@ function saveChannel($data)
             '".$data['keyword']."' )";
 
 
-  if ($conn->query($sql) === TRUE) {
+  if ($GLOBALS['conn']->query($sql) === TRUE) {
       echo "New record created successfully";
   } else {
-      echo "Error: " . $sql . "<br>" . $conn->error;
+      echo "Error: " . $sql . "<br>" . $GLOBALS['conn']->error;
   }
 
-  $conn->close();
 }
 
 
 function saveChannelStats($data)
 {
-  $servername = "localhost";
-  $username = "root";
-  $password = "root";
-  $dbname = "youtube";
-
-  // Create connection
-  $conn = new mysqli($servername, $username, $password, $dbname);
-  // Check connection
-  if ($conn->connect_error) {
-      die("Connection failed: " . $conn->connect_error);
-  } 
 
 
   $sql = "SELECT * FROM channel_stats where channel_id = '".$data['channel_id']."'";
-  $result = $conn->query($sql);
+  $result = $GLOBALS['conn']->query($sql);
 
   if ($result->num_rows > 0) {
       return;
@@ -334,33 +323,22 @@ function saveChannelStats($data)
             '".$data['videoCount']."' )";
 
 
-  if ($conn->query($sql) === TRUE) {
+  if ($GLOBALS['conn']->query($sql) === TRUE) {
       echo "New record created successfully";
   } else {
-      echo "Error: " . $sql . "<br>" . $conn->error;
+      echo "Error: " . $sql . "<br>" . $GLOBALS['conn']->error;
   }
 
-  $conn->close();
 }
 
 
 function saveVideoStats($data)
 {
-  $servername = "localhost";
-  $username = "root";
-  $password = "root";
-  $dbname = "youtube";
-
-  // Create connection
-  $conn = new mysqli($servername, $username, $password, $dbname);
-  // Check connection
-  if ($conn->connect_error) {
-      die("Connection failed: " . $conn->connect_error);
-  } 
+  
 
 
   $sql = "SELECT * FROM video_stats where video_id = '".$data['video_id']."'";
-  $result = $conn->query($sql);
+  $result = $GLOBALS['conn']->query($sql);
 
   if ($result->num_rows > 0) {
       return;
@@ -375,13 +353,12 @@ function saveVideoStats($data)
             '".$data['commentCount']."')";
 
 
-  if ($conn->query($sql) === TRUE) {
+  if ($GLOBALS['conn']->query($sql) === TRUE) {
       echo "New record created successfully";
   } else {
-      echo "Error: " . $sql . "<br>" . $conn->error;
+      echo "Error: " . $sql . "<br>" . $GLOBALS['conn']->error;
   }
 
-  $conn->close();
 }
 
 function saveVideo($data)
@@ -391,21 +368,11 @@ function saveVideo($data)
   $mails = saveMails($data['description'],$data['channel_id']);
   $urls  = saveUrls($data['description'],$data['channel_id']);
 
-  $servername = "localhost";
-  $username = "root";
-  $password = "root";
-  $dbname = "youtube";
 
-  // Create connection
-  $conn = new mysqli($servername, $username, $password, $dbname);
-  // Check connection
-  if ($conn->connect_error) {
-      die("Connection failed: " . $conn->connect_error);
-  } 
 
 
   $sql = "SELECT * FROM video where video_id = '".$data['video_id']."'";
-  $result = $conn->query($sql);
+  $result = $GLOBALS['conn']->query($sql);
 
   if ($result->num_rows > 0) {
       return;
@@ -421,13 +388,11 @@ function saveVideo($data)
             '".$data['category']."' )";
 
 
-  if ($conn->query($sql) === TRUE) {
+  if ($GLOBALS['conn']->query($sql) === TRUE) {
       echo "New record created successfully";
   } else {
-      echo "Error: " . $sql . "<br>" . $conn->error;
+      echo "Error: " . $sql . "<br>" . $GLOBALS['conn']->error;
   }
-
-  $conn->close();
 
   
 }
@@ -453,20 +418,10 @@ function saveMails($string,$channel_id)
       foreach ($mails as $mail) {
         
 
-        $servername = "localhost";
-        $username = "root";
-        $password = "root";
-        $dbname = "youtube";
-
-        // Create connection
-        $conn = new mysqli($servername, $username, $password, $dbname);
-        // Check connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        } 
+        
         
         $sql = "SELECT * FROM channel_mail where channel_id = '".$channel_id."' and mail='".$mail."' ";
-        $result = $conn->query($sql);
+        $result = $GLOBALS['conn']->query($sql);
 
         if ($result->num_rows > 0) {
             continue;
@@ -478,10 +433,10 @@ function saveMails($string,$channel_id)
                  )";
 
 
-        if ($conn->query($sql) === TRUE) {
+        if ($GLOBALS['conn']->query($sql) === TRUE) {
             echo "New record created successfully";
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
+            echo "Error: " . $sql . "<br>" . $GLOBALS['conn']->error;
         }
 
 
@@ -509,20 +464,9 @@ function saveUrls($string,$channel_id)
       foreach ($urls as $url) {
         
 
-        $servername = "localhost";
-        $username = "root";
-        $password = "root";
-        $dbname = "youtube";
-
-        // Create connection
-        $conn = new mysqli($servername, $username, $password, $dbname);
-        // Check connection
-        if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        } 
 
         $sql = "SELECT * FROM channel_url where channel_id = '".$channel_id."' and url='".$url."' ";
-        $result = $conn->query($sql);
+        $result = $GLOBALS['conn']->query($sql);
 
         if ($result->num_rows > 0) {
             continue;
@@ -534,10 +478,10 @@ function saveUrls($string,$channel_id)
                  )";
 
 
-        if ($conn->query($sql) === TRUE) {
+        if ($GLOBALS['conn']->query($sql) === TRUE) {
             echo "New record created successfully";
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
+            echo "Error: " . $sql . "<br>" . $GLOBALS['conn']->error;
         }
 
 
