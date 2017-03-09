@@ -40,45 +40,70 @@
   $_GET['maxResults'] = 50;
   $youtube = new Google_YoutubeService($client);
 
-  // printme($youtube->activities);
+  $hashtags = '#love #TagsForLikes #TagsForLikesApp #TFLers #tweegram #photooftheday #20likes #amazing #smile #follow4follow #like4like #look #instalike #igers #picoftheday #food #instadaily #instafollow #followme #girl #iphoneonly #instagood #bestoftheday #instacool #instago #all_shots #follow #webstagram #colorful #style #swag #fun #instagramers #TagsForLikes #TagsForLikesApp #food #smile #pretty #followme #nature #lol #dog #hair #onedirection #sunset #swag #throwbackthursday #instagood #beach #statigram #friends #hot #funny #blue #life #art #instahub #photo #cool #pink #bestoftheday #clouds #amazing #TagsForLikes #TagsForLikesApp #followme #all_shots #textgram #family #instago #igaddict #awesome #girls #instagood #my #bored #baby #music #red #green #water #harrystyles #bestoftheday #black #party #white #yum #flower #2012 #night #instalove #niallhoran #jj_forum #nature #TagsForLikes #TagsForLikesApp #sky #sun #summer #beach #beautiful #pretty #sunset #sunrise #blue #flowers #night #tree #twilight #clouds #beauty #light #cloudporn #photooftheday #love #green #skylovers #dusk #weather #day #red #iphonesia #mothernature #beach #sun #nature #water #TagsForLikes #TagsForLikesApp #TFLers #ocean #lake #instagood #photooftheday #beautiful #sky #clouds #cloudporn #fun #pretty #sand #reflection #amazing #beauty #beautiful #shore #waterfoam #seashore #waves #wave #sunset #sunrise #sun #TagsForLikes #TagsForLikesApp #TFLers #pretty #beautiful #red #orange #pink #sky #skyporn #cloudporn #nature #clouds #horizon #photooftheday #instagood #gorgeous #warm #view #night #morning #silhouette #instasky #all_sunsets #flowers #flower #TagsForLikes #petal #petals #nature #beautiful #love #pretty #plants #blossom #sopretty #spring #summer #flowerstagram #flowersofinstagram #flowerstyles_gf #flowerslovers #flowerporn #botanical #floral #florals #insta_pick_blossom #flowermagic #instablooms #bloom #blooms #botanical #floweroftheday #love #TagsForLikes #TagsForLikesApp #photooftheday #me #instamood #cute #igers #picoftheday #girl #guy #beautiful #fashion #instagramers #follow #smile #pretty #followme #friends #hair #swag #photo #life #funny #cool #hot #bored #portrait #baby #girls #iphonesia #selfie #selfienation #selfies #TagsForLikes #TFLers #TagsForLikesApp #me #love #pretty #handsome #instagood #instaselfie #selfietime #face #shamelessselefie #life #hair #portrait #igers #fun #followme #instalove #smile #igdaily #eyes #follow #girl #girls #love #TagsForLikes #TFLers #me #cute #picoftheday #beautiful #photooftheday #instagood #fun #smile #pretty #follow #followme #hair #friends #lady #swag #hot #cool #kik #fashion #igers #instagramers #style #sweet #eyes #beauty #guys #guy #boy #TagsForLikes #TFLers #boys #love #me #cute #handsome #picoftheday #photooftheday #instagood #fun #smile #dude #follow #followme #swag #hot #cool #kik #igers #instagramers #eyes #love #couple #cute #adorable #TagsForLikes #TagsForLikesApp #kiss #kisses #hugs #romance #forever #girlfriend #boyfriend #gf #bf #bff #together #photooftheday #happy #me #girl #boy #beautiful #instagood #instalove #loveher #lovehim #pretty #fun #smile #xoxo #friend #friends #fun #TagsForLikes #TagsForLikesApp #funny #love #instagood #igers #friendship #party #chill #happy #cute #photooftheday #live #forever #smile #bff #bf #gf #best #bestfriend #lovethem #bestfriends #goodfriends #besties #awesome #memories #goodtimes #goodtime #travel #traveling #TagsForLikes #TFLers #vacation #visiting #instatravel #instago #instagood #trip #holiday #photooftheday #fun #travelling #tourism #tourist #instapassport #instatraveling #mytravelgram #travelgram #travelingram #igtravel #cars #car #ride #drive #TagsForLikes #driver #sportscar #vehicle #vehicles #street #road #freeway #highway #sportscars #exotic #exoticcar #exoticcars #speed #tire #tires #spoiler #muffler #race #racing #wheel #wheels #rim #rims #engine #horsepower';
+  
+  $hashtags = explode('#',$hashtags);
+  unset($hashtags[0]);
+  foreach ($hashtags as $key => $value) {
+     $hashtags[$key] = trim($value);
+  }
+  
 
-  // try{
+  $index =file_get_contents("index.txt");
+  $index = intval($index);
+  
+
+  if($index == count($hashtags))
+  {
+      $index = 1;
+  }
+
+  $new_index = $index+1;
+  file_put_contents('index.txt',$new_index);
 
 
-    $pageToken = loadToken();
+  $q = $hashtags[$index];
+
+    //$pageToken = loadToken();
 
     
-    if($pageToken)
-    {
-        $searchResponse = $youtube->search->listSearch('id,snippet', array(
-          'q' => '',
+    // if($pageToken)
+    // {
+    //     $searchResponse = $youtube->search->listSearch('id,snippet', array(
+    //       'q' => '',
+    //       'maxResults' => $_GET['maxResults'],
+    //       'regionCode' => 'BR',
+    //       'pageToken' => $pageToken
+    //     ));
+    // }
+    // else
+    // {
+    //     $searchResponse = $youtube->search->listSearch('id,snippet', array(
+    //     'q' => '',
+    //     'maxResults' => $_GET['maxResults'],
+    //     'regionCode' => 'BR'
+    //     // 'pageToken' => 'CAoQAA'
+    //   ));
+    // }
+     
+     $searchResponse = $youtube->search->listSearch('id,snippet', array(
+          'q' => $q,
           'maxResults' => $_GET['maxResults'],
-          'regionCode' => 'BR',
-          'pageToken' => $pageToken
+          'regionCode' => 'BR'
+          // 'pageToken' => $pageToken
         ));
-    }
-    else
-    {
-        $searchResponse = $youtube->search->listSearch('id,snippet', array(
-        'q' => '',
-        'maxResults' => $_GET['maxResults'],
-        'regionCode' => 'BR'
-        // 'pageToken' => 'CAoQAA'
-      ));
-    }
-   
-
 
 
    
-
+     // printme($searchResponse);exit();
     while($searchResponse['nextPageToken'])
     {
 
         $response = $searchResponse['items'];
 
         $nextPageToken = $searchResponse['nextPageToken'];
-        saveToken($nextPageToken);
+        // saveToken($nextPageToken);
+
 
         processResponse($response);
         $searchResponse = $youtube->search->listSearch('id,snippet', array(
