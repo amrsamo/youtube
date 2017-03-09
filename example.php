@@ -45,12 +45,28 @@
   // try{
 
 
-    $searchResponse = $youtube->search->listSearch('id,snippet', array(
-      'q' => '',
-      'maxResults' => $_GET['maxResults'],
-      'regionCode' => 'BR'
-      // 'pageToken' => 'CAoQAA'
-    ));
+    $pageToken = loadToken();
+
+    
+    if($pageToken)
+    {
+        $searchResponse = $youtube->search->listSearch('id,snippet', array(
+          'q' => '',
+          'maxResults' => $_GET['maxResults'],
+          'regionCode' => 'BR',
+          'pageToken' => $pageToken
+        ));
+    }
+    else
+    {
+        $searchResponse = $youtube->search->listSearch('id,snippet', array(
+        'q' => '',
+        'maxResults' => $_GET['maxResults'],
+        'regionCode' => 'BR'
+        // 'pageToken' => 'CAoQAA'
+      ));
+    }
+   
 
 
 
@@ -60,10 +76,11 @@
     {
 
         $response = $searchResponse['items'];
-        
-        processResponse($response);
 
         $nextPageToken = $searchResponse['nextPageToken'];
+        saveToken($nextPageToken);
+
+        processResponse($response);
         $searchResponse = $youtube->search->listSearch('id,snippet', array(
         'q' => '',
         'maxResults' => $_GET['maxResults'],
@@ -78,8 +95,32 @@
 
 
 
+    function loadToken()
+  {
+    $sql = "SELECT * FROM token order by id desc limit 1";
+    $result = $GLOBALS['conn']->query($sql);
 
-   
+    if ($result->num_rows > 0) 
+    {
+        // UPDATE AVAILABLE TAG
+        while($row = $result->fetch_assoc()) 
+        {
+            return $row['token'];
+        }
+    }
+    else
+    {
+      return false;
+    }
+  }
+
+   function saveToken($nextPageToken)
+   {
+     $sql = "INSERT INTO token (token)
+        VALUES ('".$nextPageToken."')";
+
+      $GLOBALS['conn']->query($sql);
+   }
    
 
   
